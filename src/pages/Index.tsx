@@ -1,14 +1,17 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import Layout from "@/components/Layout";
+import HeroSection from "@/components/HeroSection";
+import MovieRow from "@/components/MovieRow";
+import { movies } from "@/data/movies";
 
-const Index = () => {
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
+const Index = () => (
+  <Layout>
+    <HeroSection />
+    <div className="container mx-auto px-4 lg:px-8">
+      <MovieRow title="Tendencias Ahora" movies={movies} />
+      <MovieRow title="Contenido Premium" movies={movies.filter((m) => m.premium || m.featured)} />
+      <MovieRow title="Recién Añadidas" movies={[...movies].reverse()} />
     </div>
-  );
-};
+  </Layout>
+);
 
 export default Index;
