@@ -24,7 +24,7 @@ const MovieDetail = () => {
 
   return (
     <Layout>
-      {/* Hero */}
+      {}
       <div className="relative h-[60vh] min-h-[400px]">
         <img src={movie.image} alt={movie.title} className="w-full h-full object-cover" />
         <div className="hero-gradient-overlay absolute inset-0" />
@@ -38,12 +38,12 @@ const MovieDetail = () => {
         </Link>
 
         <div className="flex flex-col md:flex-row gap-8">
-          {/* Poster */}
+          {}
           <div className="w-48 md:w-64 flex-shrink-0">
             <img src={movie.image} alt={movie.title} className="w-full rounded-xl shadow-2xl" />
           </div>
 
-          {/* Info */}
+          {}
           <div className="flex-1 animate-fade-in">
             <div className="flex flex-wrap items-center gap-2 mb-3">
               {movie.genre.map((g) => (
@@ -74,7 +74,7 @@ const MovieDetail = () => {
           </div>
         </div>
 
-        {/* Related */}
+        {}
         <section className="mt-16 mb-8">
           <h2 className="font-display text-xl font-bold text-foreground mb-5">También te puede gustar</h2>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">

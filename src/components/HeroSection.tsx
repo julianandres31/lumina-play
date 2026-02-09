@@ -8,14 +8,14 @@ const featured = movies.find((m) => m.featured)!;
 
 const HeroSection = () => (
   <section className="relative h-[85vh] min-h-[600px] flex items-end">
-    {/* Background */}
+    {}
     <div className="absolute inset-0">
       <img src={heroBg} alt="" className="w-full h-full object-cover" />
       <div className="hero-gradient-overlay absolute inset-0" />
       <div className="absolute inset-0 bg-gradient-to-r from-background via-background/40 to-transparent" />
     </div>
 
-    {/* Content */}
+    {}
     <div className="relative container mx-auto px-4 lg:px-8 pb-16 lg:pb-24 max-w-3xl mr-auto">
       <div className="animate-fade-in">
         <div className="flex items-center gap-2 mb-4">

@@ -36,7 +36,7 @@ const Search = () => {
       <div className="container mx-auto px-4 lg:px-8 py-10">
         <h1 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-8">Explorar</h1>
 
-        {/* Search & Filters */}
+        {}
         <div className="space-y-5 mb-10">
           <div className="relative max-w-lg">
             <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
@@ -86,7 +86,7 @@ const Search = () => {
           </div>
         </div>
 
-        {/* Results */}
+        {}
         {filtered.length > 0 ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
             {filtered.map((movie) => (

@@ -1,20 +1,26 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/context/AuthContext";
 import Layout from "@/components/Layout";
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { toast } = useToast();
+  const { login, isLoading } = useAuth();
+  const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast({ title: "Demo", description: "La autenticación se conectará con un backend próximamente." });
+    try {
+      await login({ email, password });
+      navigate("/");
+    } catch (error) {
+      
+    }
   };
 
   return (
@@ -30,8 +36,8 @@ const Login = () => {
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input
-                  type="email"
-                  placeholder="correo@ejemplo.com"
+                  type="text"
+                  placeholder="Correo o Usuario"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="pl-10 bg-muted/50 border-border/50 focus:border-primary"
@@ -61,8 +67,8 @@ const Login = () => {
                   ¿Olvidaste tu contraseña?
                 </Link>
               </div>
-              <Button type="submit" className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
-                Iniciar Sesión
+              <Button type="submit" className="w-full bg-primary text-primary-foreground hover:bg-primary/90" disabled={isLoading}>
+                {isLoading ? "Iniciando..." : "Iniciar Sesión"}
               </Button>
             </form>
             <p className="text-center text-sm text-muted-foreground mt-6">

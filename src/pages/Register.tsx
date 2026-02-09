@@ -1,18 +1,34 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Mail, Lock, User, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/context/AuthContext";
 import Layout from "@/components/Layout";
 
 const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
-  const { toast } = useToast();
+  const { register, isLoading } = useAuth();
+  const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: ""
+  });
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast({ title: "Demo", description: "El registro se conectará con un backend próximamente." });
+    try {
+      await register(formData);
+      navigate("/login");
+    } catch (error) {
+      
+    }
   };
 
   return (
@@ -27,17 +43,35 @@ const Register = () => {
             <form onSubmit={handleSubmit} className="space-y-5">
               <div className="relative">
                 <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                <Input placeholder="Nombre completo" className="pl-10 bg-muted/50 border-border/50 focus:border-primary" required />
+                <Input
+                  name="name"
+                  placeholder="Nombre completo"
+                  value={formData.name}
+                  onChange={handleChange}
+                  className="pl-10 bg-muted/50 border-border/50 focus:border-primary"
+                  required
+                />
               </div>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                <Input type="email" placeholder="correo@ejemplo.com" className="pl-10 bg-muted/50 border-border/50 focus:border-primary" required />
+                <Input
+                  name="email"
+                  type="email"
+                  placeholder="correo@ejemplo.com"
+                  value={formData.email}
+                  onChange={handleChange}
+                  className="pl-10 bg-muted/50 border-border/50 focus:border-primary"
+                  required
+                />
               </div>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input
+                  name="password"
                   type={showPassword ? "text" : "password"}
                   placeholder="Contraseña"
+                  value={formData.password}
+                  onChange={handleChange}
                   className="pl-10 pr-10 bg-muted/50 border-border/50 focus:border-primary"
                   required
                 />
@@ -49,8 +83,8 @@ const Register = () => {
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
-              <Button type="submit" className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
-                Crear Cuenta
+              <Button type="submit" className="w-full bg-primary text-primary-foreground hover:bg-primary/90" disabled={isLoading}>
+                {isLoading ? "Registrando..." : "Crear Cuenta"}
               </Button>
             </form>
             <p className="text-center text-sm text-muted-foreground mt-6">
