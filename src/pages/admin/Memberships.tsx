@@ -13,9 +13,9 @@ interface Membership {
     id: number;
     membershipName: string;
     price: number;
-    duration: number; 
+    duration: number;
     description: string;
-    imagen: string; 
+    imagen: string;
     imagenContentType: string;
 }
 
@@ -34,7 +34,7 @@ const Memberships = () => {
     const [editingId, setEditingId] = useState<number | null>(null);
     const { toast } = useToast();
 
-    
+
     const fetchMemberships = async () => {
         try {
             const response = await api.get("/api/membreships/findAll");
@@ -54,6 +54,10 @@ const Memberships = () => {
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
+            if (file.size > 5 * 1024 * 1024) { // 5MB limit
+                toast({ variant: "destructive", title: "El archivo es demasiado grande. Máximo 5MB." });
+                return;
+            }
             const reader = new FileReader();
             reader.onloadend = () => {
                 const base64String = reader.result as string;
@@ -71,14 +75,24 @@ const Memberships = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
+            const priceValue = parseFloat(formData.price);
+            const durationValue = parseInt(formData.duration);
+
+            if (isNaN(priceValue) || isNaN(durationValue)) {
+                toast({ variant: "destructive", title: "Error", description: "Por favor ingrese valores numéricos válidos para precio y duración." });
+                return;
+            }
+
             const payload = {
                 ...formData,
-                price: parseFloat(formData.price),
-                duration: parseInt(formData.duration)
+                price: priceValue,
+                duration: durationValue
             };
 
+            console.log("Sending Payload:", payload); // DEBUG PAYLOAD
+
             if (editingId) {
-                
+
                 await api.put("/api/membreships/update", { id: editingId, ...payload });
                 toast({ title: "Membresía actualizada" });
             } else {
@@ -89,9 +103,28 @@ const Memberships = () => {
             setFormData({ membershipName: "", price: "", duration: "", description: "", imagen: "", imagenContentType: "" });
             setEditingId(null);
             fetchMemberships();
-        } catch (error) {
+        } catch (error: any) {
             console.error("Error saving membership", error);
-            toast({ variant: "destructive", title: "Error al guardar" });
+            console.log("Error details:", error.response);
+
+            let errorMessage = error.response?.data?.message || "Error al guardar la membresía.";
+
+            if (error.response?.status === 400 && error.response?.data?.errors) {
+                const validationErrors = error.response.data.errors;
+                if (Array.isArray(validationErrors)) {
+                    const messages = validationErrors.map((err: any) => `${err.field}: ${err.defaultMessage}`).join(", ");
+                    errorMessage = `Error de validación: ${messages}`;
+                }
+            }
+
+            // Specific check for 403 with image payload
+            if (error.response?.status === 403 && formData.imagen) {
+                errorMessage = "Error 403: El servidor rechazó la imagen. Es posible que el archivo sea demasiado grande para la configuración del servidor. Intenta con una imagen más pequeña.";
+            } else if (error.response?.status === 403) {
+                errorMessage = "Error 403: No tienes permisos para realizar esta acción.";
+            }
+
+            toast({ variant: "destructive", title: "Error", description: errorMessage });
         }
     };
 

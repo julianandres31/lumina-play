@@ -12,7 +12,7 @@ interface Actor {
     id: number;
     nameActor: string;
     lastNameActor: string;
-    picture: string; 
+    picture: string;
     pictureContentType: string;
 }
 
@@ -48,10 +48,14 @@ const Actors = () => {
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
+            if (file.size > 5 * 1024 * 1024) { // 5MB limit
+                toast({ variant: "destructive", title: "El archivo es demasiado grande. Máximo 5MB." });
+                return;
+            }
             const reader = new FileReader();
             reader.onloadend = () => {
                 const base64String = reader.result as string;
-                
+
                 const base64Content = base64String.split(",")[1];
                 setFormData({
                     ...formData,
@@ -67,7 +71,7 @@ const Actors = () => {
         e.preventDefault();
         try {
             if (editingId) {
-                await api.put(`/api/actors/${editingId}`, formData); 
+                await api.put(`/api/actors/${editingId}`, formData);
                 toast({ title: "Actor actualizado" });
             } else {
                 await api.post("/api/actors/create", formData);
@@ -77,9 +81,19 @@ const Actors = () => {
             setFormData({ nameActor: "", lastNameActor: "", picture: "", pictureContentType: "" });
             setEditingId(null);
             fetchActors();
-        } catch (error) {
+        } catch (error: any) {
             console.error("Error saving actor", error);
-            toast({ variant: "destructive", title: "Error al guardar" });
+            console.log("Error details:", error.response); // DEBUG
+            let errorMessage = error.response?.data?.message || "Error al guardar el actor.";
+
+            // Specific check for 403 with image payload
+            if (error.response?.status === 403 && formData.picture) {
+                errorMessage = "Error 403: El servidor rechazó la imagen. Es posible que el archivo sea demasiado grande para la configuración del servidor (límite usual: 1MB). Intenta con una imagen más pequeña.";
+            } else if (error.response?.status === 403) {
+                errorMessage = "Error 403: No tienes permisos para realizar esta acción.";
+            }
+
+            toast({ variant: "destructive", title: "Error", description: errorMessage });
         }
     };
 
