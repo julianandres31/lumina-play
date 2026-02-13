@@ -26,6 +26,7 @@ import Memberships from "./pages/admin/Memberships";
 import AudiovisualContent from "./pages/admin/AudiovisualContent";
 import Users from "./pages/admin/Users";
 import Customers from "./pages/admin/Customers";
+import PlansPay from "./pages/PlansPay";
 
 const queryClient = new QueryClient();
 
@@ -44,6 +45,7 @@ const App = () => (
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/plans" element={<Plans />} />
+          <Route path="/planspay" element={<PlansPay/>} />
 
           {}
           <Route path="/search" element={

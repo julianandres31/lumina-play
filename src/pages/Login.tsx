@@ -30,7 +30,7 @@ const Login = () => {
           <div className="glass-card p-8 md:p-10">
             <div className="text-center mb-8">
               <h1 className="font-display text-2xl font-bold text-foreground mb-2">Bienvenido de vuelta</h1>
-              <p className="text-sm text-muted-foreground">Inicia sesión en tu cuenta de StreamVault</p>
+              <p className="text-sm text-muted-foreground">Inicia sesión en tu cuenta de Entertarinment</p>
             </div>
             <form onSubmit={handleSubmit} className="space-y-5">
               <div className="relative">

@@ -38,7 +38,7 @@ const Register = () => {
           <div className="glass-card p-8 md:p-10">
             <div className="text-center mb-8">
               <h1 className="font-display text-2xl font-bold text-foreground mb-2">Crea tu cuenta</h1>
-              <p className="text-sm text-muted-foreground">Únete a StreamVault y disfruta del mejor contenido</p>
+              <p className="text-sm text-muted-foreground">Únete a Entertaiment y disfruta del mejor contenido</p>
             </div>
             <form onSubmit={handleSubmit} className="space-y-5">
               <div className="relative">

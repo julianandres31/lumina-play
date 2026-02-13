@@ -14,7 +14,6 @@ import { useAuth } from "@/context/AuthContext";
 
 const navLinks = [
   { to: "/", label: "Inicio" },
-  { to: "/search", label: "Explorar" },
   { to: "/plans", label: "Planes" },
   { to: "/contact", label: "Contacto" },
 ];

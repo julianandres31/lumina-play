@@ -1,4 +1,4 @@
-import { Check, X, Sparkles, Zap } from "lucide-react";
+import { Check, X, Sparkles, Zap, Link } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import Layout from "@/components/Layout";
@@ -94,15 +94,11 @@ const Plans = () => {
                 ))}
               </ul>
               <Button
-                onClick={() => toast({ title: "Demo", description: "Los pagos se habilitarán próximamente." })}
-                className={`w-full ${
-                  plan.highlight
-                    ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                    : "bg-muted text-foreground hover:bg-muted/80"
-                }`}
+               className={`w-full ${plan.highlight ? "bg-primary text-primary-foreground hover:bg-primary/90" : "bg-muted text-foreground hover:bg-muted/80"}`}
+              onClick={() => window.location.href = "/planspay"}
               >
-                {plan.cta}
-              </Button>
+              {plan.cta}
+            </Button>
             </div>
           ))}
         </div>
