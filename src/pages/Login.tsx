@@ -8,7 +8,7 @@ import Layout from "@/components/Layout";
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const { login, isLoading } = useAuth();
   const navigate = useNavigate();
@@ -16,10 +16,14 @@ const Login = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await login({ email, password });
+      // Pass username as email to match AuthContext expectation (or update AuthContext to expect username)
+      // AuthContext expects "email" in the credentials object to map it to "username" payload.
+      // Let's pass it as `email` for now to avoid breaking AuthContext interface if other components use it,
+      // but logically it is a username.
+      await login({ email: username, password });
       navigate("/");
     } catch (error) {
-      
+
     }
   };
 
@@ -38,8 +42,8 @@ const Login = () => {
                 <Input
                   type="text"
                   placeholder="Correo o Usuario"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
                   className="pl-10 bg-muted/50 border-border/50 focus:border-primary"
                   required
                 />

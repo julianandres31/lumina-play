@@ -1,11 +1,15 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Search as SearchIcon } from "lucide-react";
+import { useSearchParams } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import Layout from "@/components/Layout";
 import MovieCard from "@/components/MovieCard";
-import { movies, genres } from "@/data/movies";
+import api from "@/lib/api";
+import { localMovieImages } from "@/data/localImages";
 
-const years = ["Todos", "2025", "2024"];
+const genres = ["Todos", "Ciencia Ficción", "Thriller", "Aventura", "Terror", "Romance", "Drama", "Acción", "Fantasía", "Noir", "Suspenso"];
+
+const years = ["Todos", "2025", "2024", "2023", "2022"];
 const sortOptions = [
   { value: "rating", label: "Popularidad" },
   { value: "year", label: "Año" },
@@ -13,13 +17,67 @@ const sortOptions = [
 ];
 
 const Search = () => {
-  const [query, setQuery] = useState("");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const initialQuery = searchParams.get("q") || "";
+  const [query, setQuery] = useState(initialQuery);
   const [selectedGenre, setSelectedGenre] = useState("Todos");
   const [selectedYear, setSelectedYear] = useState("Todos");
   const [sortBy, setSortBy] = useState("rating");
 
+  const [moviesData, setMoviesData] = useState<any[]>([]);
+
+  // Sync state with URL param if it changes externally or on mount
+  useEffect(() => {
+    const q = searchParams.get("q");
+    if (q !== null && q !== query) {
+      setQuery(q);
+    }
+  }, [searchParams]);
+
+  // Update URL when query changes
+  const handleSearchChange = (val: string) => {
+    setQuery(val);
+    if (val) {
+      setSearchParams({ q: val });
+    } else {
+      setSearchParams({});
+    }
+  };
+
+  useEffect(() => {
+    const fetchMovies = async () => {
+      try {
+        const response = await api.get("/api/audiovisual/findAll");
+        // Map API data to component format
+        const mappedMovies = response.data.map((m: any) => {
+          const localImgData = localMovieImages[m.id];
+          const finalImage = localImgData?.poster
+            ? localImgData.poster
+            : "https://placehold.co/600x900?text=" + encodeURIComponent(m.tittle);
+
+          return {
+            id: m.id,
+            title: m.tittle,
+            synopsis: m.description,
+            genre: m.filmGenres.map((g: any) => g.movieGenre),
+            year: new Date(m.relaseDate).getFullYear(),
+            duration: m.duration + " min",
+            rating: m.ageRating,
+            image: finalImage,
+            featured: false,
+            premium: false,
+          };
+        });
+        setMoviesData(mappedMovies);
+      } catch (error) {
+        console.error("Error fetching movies", error);
+      }
+    };
+    fetchMovies();
+  }, []);
+
   const filtered = useMemo(() => {
-    let result = [...movies];
+    let result = [...moviesData];
     if (query) result = result.filter((m) => m.title.toLowerCase().includes(query.toLowerCase()));
     if (selectedGenre !== "Todos") result = result.filter((m) => m.genre.includes(selectedGenre));
     if (selectedYear !== "Todos") result = result.filter((m) => m.year === parseInt(selectedYear));
@@ -29,21 +87,21 @@ const Search = () => {
       return a.title.localeCompare(b.title);
     });
     return result;
-  }, [query, selectedGenre, selectedYear, sortBy]);
+  }, [query, selectedGenre, selectedYear, sortBy, moviesData]);
 
   return (
     <Layout>
       <div className="container mx-auto px-4 lg:px-8 py-10">
         <h1 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-8">Explorar</h1>
 
-        {}
+        {/* Search & Filter Section */}
         <div className="space-y-5 mb-10">
           <div className="relative max-w-lg">
             <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
             <Input
               placeholder="Buscar películas o series..."
               value={query}
-              onChange={(e) => setQuery(e.target.value)}
+              onChange={(e) => handleSearchChange(e.target.value)}
               className="pl-11 bg-muted/50 border-border/50 focus:border-primary h-12 text-base"
             />
           </div>
@@ -53,11 +111,10 @@ const Search = () => {
               <button
                 key={genre}
                 onClick={() => setSelectedGenre(genre)}
-                className={`px-4 py-2 rounded-full text-xs font-medium transition-all ${
-                  selectedGenre === genre
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground border border-border/50"
-                }`}
+                className={`px-4 py-2 rounded-full text-xs font-medium transition-all ${selectedGenre === genre
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground border border-border/50"
+                  }`}
               >
                 {genre}
               </button>
@@ -86,7 +143,7 @@ const Search = () => {
           </div>
         </div>
 
-        {}
+        {/* Results Section */}
         {filtered.length > 0 ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
             {filtered.map((movie) => (

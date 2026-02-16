@@ -5,14 +5,24 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import Layout from "@/components/Layout";
+import { publicApi } from "@/lib/api";
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
   const { toast } = useToast();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast({ title: "Correo enviado", description: "Si la cuenta existe, recibirás instrucciones para restablecer tu contraseña." });
+    try {
+      // Standard JHipster/Spring often expects the email as the body string
+      await publicApi.post("/api/account/reset-password/init", email, {
+        headers: { "Content-Type": "text/plain" }
+      });
+      toast({ title: "Correo enviado", description: "Si la cuenta existe, recibirás instrucciones para restablecer tu contraseña." });
+    } catch (error) {
+      console.error(error);
+      toast({ variant: "destructive", title: "Error", description: "No se pudo enviar el correo. Intenta nuevamente." });
+    }
   };
 
   return (

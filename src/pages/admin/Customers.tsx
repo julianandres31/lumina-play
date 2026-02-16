@@ -13,8 +13,6 @@ import { Badge } from "@/components/ui/badge";
 interface User {
     id: number;
     login: string;
-    firstName: string;
-    lastName: string;
 }
 
 interface DocType {
@@ -43,32 +41,32 @@ interface Customer {
     documentNumber: string;
     firstName: string;
     secondName: string;
-    firstLasName: string; 
+    firstLasName: string;
     secondLastName: string;
     user: User;
     filmGenres: FilmGenre[];
     documentType: DocType;
     sex: Sex;
-    cities: City; 
+    cities: City;
 }
 
 const Customers = () => {
-    
+
     const [customers, setCustomers] = useState<Customer[]>([]);
     const [loading, setLoading] = useState(true);
 
-    
+
     const [users, setUsers] = useState<User[]>([]);
     const [docTypes, setDocTypes] = useState<DocType[]>([]);
     const [sexes, setSexes] = useState<Sex[]>([]);
     const [cities, setCities] = useState<City[]>([]);
     const [genres, setGenres] = useState<FilmGenre[]>([]);
 
-    
+
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [editingId, setEditingId] = useState<number | null>(null);
 
-    
+
     const [formData, setFormData] = useState({
         documentNumber: "",
         firstName: "",
@@ -84,7 +82,7 @@ const Customers = () => {
 
     const { toast } = useToast();
 
-    
+
     const fetchData = async () => {
         try {
             const [custRes, userRes, docRes, sexRes, cityRes, genreRes] = await Promise.all([
@@ -127,7 +125,7 @@ const Customers = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        
+
         if (!formData.userId || !formData.documentTypeId || !formData.sexId || !formData.cityId) {
             toast({ variant: "destructive", title: "Por favor complete todos los campos obligatorios" });
             return;
@@ -142,7 +140,7 @@ const Customers = () => {
             user: { id: parseInt(formData.userId) },
             documentType: { id: parseInt(formData.documentTypeId) },
             sex: { id: parseInt(formData.sexId) },
-            cities: { id: parseInt(formData.cityId) }, 
+            cities: { id: parseInt(formData.cityId) },
             filmGenres: formData.selectedGenreIds.map(id => ({ id }))
         };
 
@@ -228,7 +226,7 @@ const Customers = () => {
                             </DialogHeader>
                             <form onSubmit={handleSubmit} className="space-y-6 mt-4">
 
-                                {}
+                                {/* Nombres */}
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
                                         <label className="text-sm font-medium mb-1 block">Primer Nombre</label>
@@ -262,7 +260,7 @@ const Customers = () => {
                                     </div>
                                 </div>
 
-                                {}
+                                {/* Documento */}
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
                                         <label className="text-sm font-medium mb-1 block">Tipo de Documento</label>
@@ -288,7 +286,7 @@ const Customers = () => {
                                     </div>
                                 </div>
 
-                                {}
+                                {/* Sexo y Ciudad */}
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
                                         <label className="text-sm font-medium mb-1 block">Sexo</label>
@@ -320,7 +318,7 @@ const Customers = () => {
                                     </div>
                                 </div>
 
-                                {}
+                                {/* Usuario */}
                                 <div>
                                     <label className="text-sm font-medium mb-1 block">Usuario del Sistema</label>
                                     <select
@@ -332,14 +330,14 @@ const Customers = () => {
                                         <option value="">Seleccione un usuario...</option>
                                         {users.map(u => (
                                             <option key={u.id} value={u.id}>
-                                                {u.login} - {u.firstName} {u.lastName}
+                                                {u.login}
                                             </option>
                                         ))}
                                     </select>
                                     <p className="text-xs text-muted-foreground mt-1">El cliente debe estar asociado a un usuario registrado.</p>
                                 </div>
 
-                                {}
+                                {/* Géneros */}
                                 <div>
                                     <label className="text-sm font-medium mb-2 block">Gustos / Géneros Favoritos</label>
                                     <div className="flex flex-wrap gap-2 p-4 border rounded-md bg-muted/20 max-h-40 overflow-y-auto">

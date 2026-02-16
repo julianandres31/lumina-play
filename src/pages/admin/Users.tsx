@@ -5,15 +5,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Plus, Pencil, Trash2, Key } from "lucide-react";
+import { Plus, Pencil, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
 
 interface User {
     id: number;
     login: string;
-    firstName: string;
-    lastName: string;
     email: string;
     activated: boolean;
     langKey: string;
@@ -28,10 +26,8 @@ const Users = () => {
     const [editingId, setEditingId] = useState<number | null>(null);
     const [formData, setFormData] = useState({
         login: "",
-        firstName: "",
-        lastName: "",
         email: "",
-        password: "", 
+        password: "",
         langKey: "es",
         imageUrl: "",
         activated: true,
@@ -40,7 +36,7 @@ const Users = () => {
 
     const { toast } = useToast();
 
-    
+    // Roles disponibles
     const AVAILABLE_ROLES = ["ROLE_ADMIN", "ROLE_USER"];
 
     const fetchUsers = async () => {
@@ -49,7 +45,7 @@ const Users = () => {
             setUsers(response.data.sort((a: User, b: User) => a.id - b.id));
         } catch (error) {
             console.error("Error fetching users", error);
-            
+            // toast({ variant: "destructive", title: "Error al cargar usuarios" });
         } finally {
             setLoading(false);
         }
@@ -73,7 +69,7 @@ const Users = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        
+        // Validar contraseña si es nuevo usuario
         if (!editingId && !formData.password) {
             toast({ variant: "destructive", title: "La contraseña es obligatoria para nuevos usuarios" });
             return;
@@ -81,8 +77,6 @@ const Users = () => {
 
         const payload = {
             login: formData.login,
-            firstName: formData.firstName,
-            lastName: formData.lastName,
             email: formData.email,
             password: formData.password,
             langKey: formData.langKey,
@@ -94,11 +88,6 @@ const Users = () => {
         try {
             if (editingId) {
                 await api.put(`/api/users/${editingId}`, payload);
-
-                
-                
-                
-
                 toast({ title: "Usuario actualizado" });
             } else {
                 await api.post("/api/users/create", payload);
@@ -128,10 +117,8 @@ const Users = () => {
     const handleEdit = (user: User) => {
         setFormData({
             login: user.login,
-            firstName: user.firstName,
-            lastName: user.lastName,
             email: user.email,
-            password: "", 
+            password: "", // No mostramos la contraseña
             langKey: user.langKey,
             imageUrl: user.imageUrl,
             activated: user.activated,
@@ -144,8 +131,6 @@ const Users = () => {
     const resetForm = () => {
         setFormData({
             login: "",
-            firstName: "",
-            lastName: "",
             email: "",
             password: "",
             langKey: "es",
@@ -190,24 +175,6 @@ const Users = () => {
                                             type="email"
                                             value={formData.email}
                                             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                            required
-                                        />
-                                    </div>
-                                </div>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label className="text-sm font-medium mb-1 block">Nombre</label>
-                                        <Input
-                                            value={formData.firstName}
-                                            onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-                                            required
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="text-sm font-medium mb-1 block">Apellido</label>
-                                        <Input
-                                            value={formData.lastName}
-                                            onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
                                             required
                                         />
                                     </div>
@@ -271,7 +238,6 @@ const Users = () => {
                             <TableRow>
                                 <TableHead>ID</TableHead>
                                 <TableHead>Usuario</TableHead>
-                                <TableHead>Nombre Completo</TableHead>
                                 <TableHead>Email</TableHead>
                                 <TableHead>Roles</TableHead>
                                 <TableHead>Estado</TableHead>
@@ -281,18 +247,17 @@ const Users = () => {
                         <TableBody>
                             {loading ? (
                                 <TableRow>
-                                    <TableCell colSpan={7} className="text-center py-8">Cargando...</TableCell>
+                                    <TableCell colSpan={6} className="text-center py-8">Cargando...</TableCell>
                                 </TableRow>
                             ) : users.length === 0 ? (
                                 <TableRow>
-                                    <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">No hay usuarios registrados.</TableCell>
+                                    <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">No hay usuarios registrados.</TableCell>
                                 </TableRow>
                             ) : (
                                 users.map((user) => (
                                     <TableRow key={user.id}>
                                         <TableCell>{user.id}</TableCell>
                                         <TableCell className="font-medium">{user.login}</TableCell>
-                                        <TableCell>{user.firstName} {user.lastName}</TableCell>
                                         <TableCell>{user.email}</TableCell>
                                         <TableCell>
                                             <div className="flex flex-wrap gap-1">

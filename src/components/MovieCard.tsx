@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Star, Lock, Play } from "lucide-react";
-import type { Movie } from "@/data/movies";
+import type { Movie } from "@/types/content";
 
 const MovieCard = ({ movie }: { movie: Movie }) => (
   <Link to={`/movie/${movie.id}`} className="group block">

@@ -1,5 +1,5 @@
 import MovieCard from "./MovieCard";
-import type { Movie } from "@/data/movies";
+import type { Movie } from "@/types/content";
 
 interface MovieRowProps {
   title: string;

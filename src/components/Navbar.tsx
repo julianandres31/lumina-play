@@ -9,8 +9,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { movies } from "@/data/movies";
+import { localMovieImages } from "@/data/localImages";
 import { useAuth } from "@/context/AuthContext";
+
+// ... existing imports
 
 const navLinks = [
   { to: "/", label: "Inicio" },
@@ -26,23 +28,53 @@ const Navbar = () => {
   const searchInputRef = useRef<HTMLInputElement>(null);
   const { isAuthenticated, logout, user } = useAuth();
 
-  
+
   useEffect(() => {
     setIsSearchOpen(false);
     setSearchQuery("");
   }, [location.pathname]);
 
-  
+
   useEffect(() => {
     if (isSearchOpen && searchInputRef.current) {
       setTimeout(() => searchInputRef.current?.focus(), 100);
     }
   }, [isSearchOpen]);
 
+  const [moviesData, setMoviesData] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchMovies = async () => {
+      if (!isAuthenticated) return;
+      try {
+        const response = await import("@/lib/api").then(m => m.default.get("/api/audiovisual/findAll"));
+        setMoviesData(response.data);
+      } catch (error) {
+        console.error("Error fetching movies for search", error);
+      }
+    };
+    fetchMovies();
+  }, [isAuthenticated]);
+
   const filteredMovies = searchQuery
-    ? movies.filter((movie) =>
-      movie.title.toLowerCase().includes(searchQuery.toLowerCase())
-    ).slice(0, 6)
+    ? moviesData
+      .filter((movie) =>
+        movie.tittle.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+      .slice(0, 6)
+      .map(movie => {
+        const localImgData = localMovieImages[movie.id];
+        const finalImage = localImgData?.poster
+          ? localImgData.poster
+          : "https://placehold.co/600x900?text=" + encodeURIComponent(movie.tittle);
+
+        return {
+          id: movie.id,
+          title: movie.tittle,
+          year: new Date(movie.relaseDate).getFullYear(),
+          image: finalImage,
+        };
+      })
     : [];
 
   return (
@@ -51,7 +83,7 @@ const Navbar = () => {
         }`}>
         <div className="container mx-auto px-4 lg:px-8">
           <div className="flex items-center justify-between h-16 lg:h-20">
-            {}
+            { }
             <Link to="/" className={`flex items-center gap-2 ${isSearchOpen ? "hidden md:flex" : "flex"}`}>
               <div className="w-8 h-8 rounded-lg flex items-center justify-center">
                 <span className="font-display font-bold text-primary-foreground text-sm"></span>
@@ -60,7 +92,7 @@ const Navbar = () => {
               <span className="font-display font-bold text-xl text-foreground">Entretainment</span>
             </Link>
 
-            {}
+            { }
             {!isSearchOpen && isAuthenticated && (
               <div className="hidden md:flex items-center gap-8 animate-fade-in">
                 {navLinks.map((link) => (
@@ -74,7 +106,7 @@ const Navbar = () => {
                   </Link>
                 ))}
 
-                {}
+                { }
                 {user?.role?.includes("ADMIN") && (
                   <DropdownMenu>
                     <DropdownMenuTrigger className="flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-primary transition-colors focus:outline-none">
@@ -103,7 +135,7 @@ const Navbar = () => {
               </div>
             )}
 
-            {}
+            { }
             <div className="flex items-center gap-3">
               {!isSearchOpen ? (
                 <>
@@ -136,7 +168,7 @@ const Navbar = () => {
                     </div>
                   )}
 
-                  {}
+                  { }
                   <button
                     className="md:hidden text-foreground"
                     onClick={() => setIsOpen(!isOpen)}
@@ -158,7 +190,7 @@ const Navbar = () => {
             </div>
           </div>
 
-          {}
+          { }
           {isAuthenticated && isSearchOpen && (
             <div className="w-full pb-8 animate-slide-up">
               <div className="relative max-w-3xl mx-auto">
@@ -173,7 +205,7 @@ const Navbar = () => {
                 />
               </div>
 
-              {}
+              { }
               {searchQuery && (
                 <div className="max-w-5xl mx-auto mt-8">
                   {filteredMovies.length > 0 ? (
@@ -217,7 +249,7 @@ const Navbar = () => {
             </div>
           )}
 
-          {}
+          { }
           {isOpen && !isSearchOpen && (
             <div className="md:hidden py-4 border-t border-border/30 animate-fade-in">
               <div className="flex flex-col gap-3">

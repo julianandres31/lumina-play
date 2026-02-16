@@ -1,31 +1,22 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import api from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
+import { AuthContextType, RegisterPayload } from "@/types/auth";
 
-interface User {
+interface AuthUser {
     email: string;
-    name?: string;
-    role?: string;
-}
-
-interface AuthContextType {
-    user: User | null;
-    isAuthenticated: boolean;
-    isLoading: boolean;
-    login: (data: any) => Promise<void>;
-    register: (data: any) => Promise<void>;
-    logout: () => void;
+    name: string;
+    role: string;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-    const [user, setUser] = useState<User | null>(null);
+    const [user, setUser] = useState<AuthUser | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const { toast } = useToast();
 
     useEffect(() => {
-        
         const token = localStorage.getItem("token");
         const storedUser = localStorage.getItem("user");
 
@@ -37,14 +28,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     const login = async (credentials: any) => {
         try {
+            
             const response = await api.post("/api/auth/login", {
-                username: credentials.email, 
+                username: credentials.email,
                 password: credentials.password
             });
 
-            
             const { token, nombreCompleto, rol } = response.data;
-            const user: User = {
+            const user: AuthUser = {
                 email: credentials.email,
                 name: nombreCompleto,
                 role: rol
@@ -63,23 +54,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         }
     };
 
-    const register = async (userData: any) => {
+    const register = async (userData: RegisterPayload) => {
         try {
-            
-            const response = await api.post("/api/users/create", {
-                firstName: userData.name.split(" ")[0] || userData.name,
-                lastName: userData.name.split(" ").slice(1).join(" ") || "",
-                email: userData.email,
-                password: userData.password,
-                login: userData.email, 
-                authorities: ["ROLE_USER"], 
-                activated: true,
-                langKey: "es", 
-                imageUrl: "" 
-            });
-
+            await api.post("/api/users/register", userData);
             toast({ title: "Cuenta creada", description: "Por favor inicia sesión con tus nuevas credenciales." });
-
         } catch (error: any) {
             console.error(error);
             const message = error.response?.data?.mensaje || error.response?.data?.error || "Error al registrarse";

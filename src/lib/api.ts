@@ -11,6 +11,7 @@ const api = axios.create({
 });
 
 
+
 api.interceptors.request.use(
     (config) => {
         const token = localStorage.getItem("token");
@@ -23,5 +24,12 @@ api.interceptors.request.use(
         return Promise.reject(error);
     }
 );
+
+export const publicApi = axios.create({
+    baseURL: API_URL,
+    headers: {
+        "Content-Type": "application/json",
+    },
+});
 
 export default api;

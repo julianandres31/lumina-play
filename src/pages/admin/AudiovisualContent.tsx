@@ -82,8 +82,13 @@ const AudiovisualContent = () => {
   const [newCastMember, setNewCastMember] = useState({
     actorId: "",
     character: "",
-    actorType: "Secondary",
   });
+
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const filteredContents = contents.filter((content) =>
+    content.tittle.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   useEffect(() => {
     fetchData();
@@ -142,8 +147,6 @@ const AudiovisualContent = () => {
         actorId: Number(newCastMember.actorId),
         audiovisualContentId: selectedContentId,
         character: newCastMember.character,
-        actorType: newCastMember.actorType,
-
         audiovisualContent: { id: selectedContentId },
         actor: { id: Number(newCastMember.actorId) },
       };
@@ -151,7 +154,7 @@ const AudiovisualContent = () => {
       await api.post("/api/actor-audiovisual/create", payload);
       toast({ title: "Actor añadido al reparto" });
       fetchCast(selectedContentId);
-      setNewCastMember({ actorId: "", character: "", actorType: "Secondary" });
+      setNewCastMember({ actorId: "", character: "" });
     } catch (error) {
       console.error("Error adding cast member", error);
       toast({ variant: "destructive", title: "Error al añadir actor" });
@@ -277,7 +280,7 @@ const AudiovisualContent = () => {
   return (
     <Layout>
       <div className="container mx-auto px-4 py-8 lg:px-8 mt-20">
-        {}
+        { }
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold text-foreground">
             Contenido Audiovisual
@@ -294,7 +297,7 @@ const AudiovisualContent = () => {
                 <Plus className="w-4 h-4 mr-2" /> Nuevo Contenido
               </Button>
             </DialogTrigger>
-            {}
+            { }
             <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>
@@ -302,7 +305,7 @@ const AudiovisualContent = () => {
                 </DialogTitle>
               </DialogHeader>
               <form onSubmit={handleSubmit} className="space-y-6 mt-4">
-                {}
+                { }
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="text-sm font-medium mb-1 block">
@@ -424,7 +427,7 @@ const AudiovisualContent = () => {
                   />
                 </div>
 
-                {}
+                { }
                 <div>
                   <label className="text-sm font-medium mb-2 block">
                     Géneros
@@ -460,14 +463,14 @@ const AudiovisualContent = () => {
             </DialogContent>
           </Dialog>
 
-          {}
+          { }
           <Dialog open={isCastDialogOpen} onOpenChange={setIsCastDialogOpen}>
             <DialogContent className="max-w-2xl">
               <DialogHeader>
                 <DialogTitle>Gestionar Reparto</DialogTitle>
               </DialogHeader>
 
-              {}
+              { }
               <form
                 onSubmit={handleAddCastMember}
                 className="flex gap-2 items-end mb-6 p-4 bg-muted/20 rounded-lg"
@@ -512,36 +515,20 @@ const AudiovisualContent = () => {
                     required
                   />
                 </div>
-                <div className="w-32">
-                  <label className="text-xs font-medium mb-1 block">Tipo</label>
-                  <select
-                    className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm"
-                    value={newCastMember.actorType}
-                    onChange={(e) =>
-                      setNewCastMember({
-                        ...newCastMember,
-                        actorType: e.target.value,
-                      })
-                    }
-                  >
-                    <option value="Protagonista">Protagonista</option>
-                    <option value="Antagonista">Antagonista</option>
-                    <option value="Secundario">Secundario</option>
-                  </select>
-                </div>
+
                 <Button type="submit" size="sm">
                   Añadir
                 </Button>
               </form>
 
-              {}
+              { }
               <div className="border rounded-md overflow-hidden">
                 <Table>
                   <TableHeader>
                     <TableRow>
                       <TableHead>Actor</TableHead>
                       <TableHead>Personaje</TableHead>
-                      <TableHead>Tipo</TableHead>
+
                       <TableHead className="text-right">Acciones</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -563,7 +550,7 @@ const AudiovisualContent = () => {
                             {member.actor?.lastNameActor}
                           </TableCell>
                           <TableCell>{member.character}</TableCell>
-                          <TableCell>{member.actorType}</TableCell>
+
                           <TableCell className="text-right">
                             <Button
                               variant="ghost"
@@ -587,6 +574,17 @@ const AudiovisualContent = () => {
           </Dialog>
         </div>
 
+        <div className="mb-4">
+          <Input
+            placeholder="Buscar por título..."
+            value={searchTerm}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              setSearchTerm(e.target.value)
+            }
+            className="max-w-sm"
+          />
+        </div>
+
         <div className="bg-card rounded-xl border border-border/50 shadow-sm overflow-hidden">
           <Table>
             <TableHeader>
@@ -607,17 +605,17 @@ const AudiovisualContent = () => {
                     Cargando...
                   </TableCell>
                 </TableRow>
-              ) : contents.length === 0 ? (
+              ) : filteredContents.length === 0 ? (
                 <TableRow>
                   <TableCell
                     colSpan={7}
                     className="text-center py-8 text-muted-foreground"
                   >
-                    No hay contenido registrado.
+                    No se encontró contenido.
                   </TableCell>
                 </TableRow>
               ) : (
-                contents.map((content) => (
+                filteredContents.map((content) => (
                   <TableRow key={content.id}>
                     <TableCell>{content.id}</TableCell>
                     <TableCell className="font-medium">

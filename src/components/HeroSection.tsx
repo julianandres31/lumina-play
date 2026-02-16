@@ -1,21 +1,23 @@
 import { Link } from "react-router-dom";
 import { Play, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import heroBg from "@/assets/hero-bg.jpg";
-import { movies } from "@/data/movies";
+import type { Movie } from "@/types/content";
+import dragonBall from "@/public/movies/dragon-ball.jpg";
 
-const featured = movies.find((m) => m.featured)!;
+interface HeroSectionProps {
+  featured: Movie;
+}
 
-const HeroSection = () => (
+const HeroSection = ({ featured }: HeroSectionProps) => (
   <section className="relative h-[85vh] min-h-[600px] flex items-end">
-    {}
+    { }
     <div className="absolute inset-0">
-      <img src={heroBg} alt="" className="w-full h-full object-cover" />
+      <img src="/movies/dragon-ball.jpg" alt="" className="w-full h-full object-cover" />
       <div className="hero-gradient-overlay absolute inset-0" />
       <div className="absolute inset-0 bg-gradient-to-r from-background via-background/40 to-transparent" />
     </div>
 
-    {}
+    { }
     <div className="relative container mx-auto px-4 lg:px-8 pb-16 lg:pb-24 max-w-3xl mr-auto">
       <div className="animate-fade-in">
         <div className="flex items-center gap-2 mb-4">
